@@ -1,1 +1,1 @@
-# study_memo
+# memo_study => study_memo
