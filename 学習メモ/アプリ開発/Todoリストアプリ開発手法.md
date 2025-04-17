@@ -1,0 +1,18 @@
+- Rails+Reactで作成する方法
+    - Reactで状態としてタスクをとらえてコンポーネント思考でプログラムする方法
+        - このアプリケーションはローカル環境にDBを作成してデータを恒久的に保存する
+- JavaScriptでTodoアプリを作成する方法
+    - バックエンドは絡ませずにフロントだけで簡潔させる
+        - ローカルストレージに保存されるようにする
+    - タスクの捉え方
+        - タスクを配列として考える
+            - ドキュメントセレクターを使ってJSをDOMノード化してセレクターを使ってDOM要素を取得する
+                - 空の配列を用意してその配列に値を加える頃でタスクリストというものを表現する
+        - getElementsByClassName
+            - deleteButtonなどクリックに応じてイベントが発生するように
+    - 空の配列
+        - const taskValue = document.getElementsByClassName('task_value')[0];
+    - 配列に値を追加
+        - const listItem = document.createElement('li');
+            - 子要素の追加をする
+                - という意味
