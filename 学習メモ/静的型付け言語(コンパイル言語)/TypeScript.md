@@ -155,6 +155,21 @@
                         - 型
         - TypeScriptはスケーラブルなJavaScriptの上位互換言語
           - 大規模開発にも適している
+    - 開発環境
+      - Node.js
+        - Node.jsは本来サーバーサイドで動作sる事を目的に開発されたソフト
+          - V8エンジンを搭載しJSが実行する事ができる
+            - V8エンジン
+              - Google Chromeにも搭載されている
+                - ブラウザではJSを受け取りHTMLを解析するためのDOM APIがある
+          - Node.jsにはDOM APIがない
+            - ファイルシステムにアクセスするAPI
+            - HTTPサーバーを建てるためのAPI
+            - プロセスを起動したり終了したりするAPI
+              - などなど、複数のAPIを使う
+        - FE開発においてもNode.jsが必要になる
+          - TSの開発環境においてTSCが必要なためNode.jsが必要になる
+            - そのため、フロントエンドでもNode.jsを使い開発を進める
     - 静的型付け言語と動的型付け言語の差
         - 静的型付け言語
             - コンパイル時に型が決まる言語
@@ -1513,8 +1528,7 @@
             function Hello(props: Props) {
               return <div>Hello, {props.name}</div>;
             };
-            ```
-            
+            ```           
     - React.ReactNode
         - React要素の型
             - Reactでレンダリングできるあらゆるものを表現できる
@@ -1549,8 +1563,7 @@
             };
             ```
             
-            現状のコードではPropsとしてここに内容という要素しか受け取っていないが{children}として他の要素を受け取る事も可能
-            
+            現状のコードではPropsとしてここに内容という要素しか受け取っていないが{children}として他の要素を受け取る事も可能            
     - イベントハンドラーに型の指定をする
         - Reactのイベントに型を指定する事でハンドラーから受け取る値を明確にする
             - クリックイベント
@@ -1638,8 +1651,7 @@
                     const [users, setUsers] = useState<{
                     	 name: string; age: number 
                      }[]>([]);
-                    ```
-                    
+                    ```                    
     - useReducerと型定義
         - useReducer複数の状態管理を1つにしてまとめる事ができるHook
             - 状態（`State`）とアクション（`Action`）の型を定義する事が一般的
@@ -1716,8 +1728,7 @@
                 
                 const [state, dispatch] = useReducer(counterReducer, initialState);
                 
-                ```
-                
+                ```                
     - 演習
         - useRef
             - 要件
@@ -1820,7 +1831,6 @@
     - プログラミングにおいてプログラムの重要な概念
         - 安全である事
         - 修正・改善などコードの保守がしやすい事
-
 
 - 読んで学ぶTypeScript
   - 値・型・変数
