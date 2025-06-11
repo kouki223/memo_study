@@ -313,7 +313,7 @@
             - 親クラスを元に子クラスを作る
             - 継承の対象になるもの
                 - インスタンス変数
-                インスタンスメソッド
+                    - インスタンスメソッド
         - インスタンス
             - クラス（設計図）を元に作られたもの
                 - human class
@@ -337,8 +337,93 @@
                             - 体重70kg 身長180cm スピード 普通 スタミナ 普通
                         - 堤竹インスタンス
                             - 体重60 身長165cm スピード高 スタミナ低
-            - 記載方法
+            - インスタンス変数への値を定義方法
                 - クラス内でattr_accessor シンボル変数名とする事で変数名の情報を持たせる事ができる
+            - インスタンス変数を読み取り専用にするメソッド
+                - attr_readerメソッド
+                ```Ruby
+                class User
+                # 読み取り用のメソッドだけを定義する
+                attr_reader :name
+                def initialize(name)
+                @name = name
+                end
+                user = User.new('Alice')
+                # @nameの参照はできる
+                user.name #=> "Alice"
+                # @nameを変更しようとするとエラーになる
+                user.name = 'Bob'
+                #=> undefined method `name=' for #<User:0x0000000158bc7b50 ...> (NoMethodError)
+                ```
+            - インスタンスを書き込み専用にする
+                - attr_writer
+                ```Ruby
+                class User
+                # 書き込み用のメソッドだけを定義する
+                attr_writer :name
+                def initialize(name)
+                @name = name
+                end
+                end
+                user = User.new('Alice')
+                # @nameは変更できる
+                user.name = 'Bob'
+                # @nameの参照はできない
+                user.name
+                #=> undefined method `name' for #<User:0x0000000143ad1c60 ...> (NoMethodError)
+                ```
+            - 複数の引数を渡して複数のインスタンス変数に対するアクセサメソッドの定義
+                - カンマで区切って複数の引数を渡す
+                    - 複数のインスタンス変数に対するアクセサメソッドを定義する事ができる
+                ```Ruby
+                class User
+                # @nameと@ageへのアクセサメソッドを定義する
+                attr_accessor :name, :age
+                def initialize(name, age)
+                @name = name
+                @age = age
+                end
+                end
+                user = User.new('Alice', 20)
+                user.name #=> "Alice"
+                ```
+            - 参照可能範囲
+                - 参照できる範囲はクラス内
+                    - クラス外からの参照には参照するためのメソッドを作成する必要がある
+            - 外部からインスタンス変数の内容を変更する
+                - Rubyは=で終わるメソッドを定義すると変数に代入する形でメソッドを呼び出す事ができる
+                ```Ruby
+                class User
+                    def initialize(name)
+                        @name = name
+                    end
+                    # @nameを外部から参照するためのメソッド
+                    def name
+                        @name
+                    end
+                    ↑
+                    ゲッターメソッド
+                    # @nameを外部から変更するためのメソッド
+                    def name=(value)
+                        @name = value
+                    end
+                    ↑
+                    セッターメソッド
+                end
+                user = User.new('Alice')
+                # 変数に代入しているように見えるが、実際はname=メソッドを呼び出している
+                user.name = 'Bob'
+                user.name #=> "Bob"
+                ```
+                - ゲッターメソッドとセッターメソッドを総称して「アクセサメソッド」と呼ぶ
+        - 未定義の変数へのアクセスに応じた反応
+            - ローカル変数
+                - ローカル変数は参照する前に値を代入する必要がある
+                    - 値の代入前に参照しようとするとエラーになってしまう
+            - インスタンス変数
+                - 値の代入をせずに値の参照をした場合
+                    - エラーにはならずにnilになる
+                        - インスタンスの変数名をタイプミスをすると不具合の原因になる可能性がありえるためタイプには注意する必要がある
     - クラスとインスタンスの概念
         - クラスに例えばどういうものがあるか？
           - 食べ物クラス
@@ -2545,7 +2630,10 @@
                 </div>
                 <% end %>
                 ```
-
+- irb(Interactive Ruby:埋め込み型Ruby)
+    - クラス定義を繰り返す場合の注意点
+        - クラスの定義は複数回繰り返して行われると上書きされる
+            - テキストでは全く別物と扱っている場合があるため注意する事が必要
 - 概念
     - プログラムの本質
         - データと処理（コンピュータへの命令）

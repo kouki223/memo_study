@@ -70,7 +70,6 @@
                 - JSX のタグは、HTML のように複数の要素を並べて書くことができない
                     - １つの要素は１つの親要素で囲む必要がある
                         - その上でさらに<div>などを使って囲む
-        
         ```jsx
         import React from "react";
         import {creatRoot} from "react-dom/client";
@@ -149,6 +148,131 @@
         - プログラムにおいて現実世界のものや概念をオブジェクトとして表現して、それらを組み合わせてシステムを構築するもの。
     - ライフサイクル
         - コンポーネントの表示から消えるまでの一連の処理
+    - Reactの思考プロセス
+      - Reactにおいて設定を考える方法やアプリ構築において今までの考え方からから変化させる
+        - UIコンポーネントと呼ばれる部品にまずは分解し、各コンポーネントの視覚状態を記述する
+          - 複数のコンポーネントを接続してデータが流れるようにする
+      - ステップは全部で5つに分類される
+        - ステップ1
+          - UIをコンポーネントの階層に分ける
+            - プログラマー
+              - 単一責任の法則 -> デメテルの法則
+                - 1つのコンポーネントは理想的には1つのことだけを行うべきという事
+                  - 大きくなってしまった場合には1つのことだけを行うべきというもの
+                    - 大きなコンポーネントができてしまった場合にはサブコンポーネントに切り分けることを考える
+            - CSSエンジニア
+              - どの部分にどのクラスセレクターを適用させるのか？
+                - コンポーネントよりは粒度は荒めに設定する
+            - デザイナー
+              - デザインのレイヤーを考える
+          - JSONのデータがうまく構造化されているとコンポーネントに階層わけした際に自然と対応していることが多くある
+            - UIとデータモデルが同じアーキテクチャを持っていることが多い
+              - FilterableProductTable
+                - SearchBar
+                  - ProductTable
+                    - ProductCategoryRow
+                    - ProductRow
+        - ステップ2
+          - Reactで静的なバージョンを作成する
+            - 静的なUIのレンダーはタイプ量が多いが、考えることが少なく済む
+            - インタラクティブな要素はタイプ量は少ないが、考えることが多くなる
+          - データモデルのレンダーにおいてstateは使用せずにpropsを渡してデータを渡す
+            - stateというのは時間と共に変化するデータを扱うためのものになる
+          - ボトムアップ or　トップダウン
+            - トップダウン
+              - 高い構想にあるコンポーネントから構築を始める
+                - 単純なアプリや構築の場合には簡単
+                  - データがトップレベルのコンポーネントからツリーの下の方にあるコンポーネントに流れていく単方向データフローと呼ぶ
+            - ボトムアップ
+              - 低い階層にあるコンポーネントから構築を始める
+                - 大規模プロジェクトにおいては簡単に進めることができる
+        - ステップ3 => propsとstate、DRYの原則
+          - インタラクティブなReactを記載するにあたってユーザーが背後にあるデータモデルを変更できるようにする必要がある
+            - これにstateを使う
+          - stateとは？
+            - stateとはアプリケーションが記憶する必要のある変化するデータの最小限のセット
+              - stateを考える時にDRYの原則というものが重要になってくる
+                - 最小限の表現を見つけ出し、必要になったらその場で計算する
+                  - リスト内の商品数の表示　＝＞　リストの長さを読み取る
+          - 今回の例で考えられるstate
+            1. 元となる商品のリスト => props
+            2. ユーザが入力した検索文字列 => state
+            3. チェックボックスの値 => state
+            4. フィルタ済みの商品のリスト => 検索テキストとチェックボックスの値によって計算することができるためstateではない
+          - Reactの2つのデータモデル
+            - props => 親コンポーネントから子コンポーネントに渡す => 外観をカスタマイズ
+            - state => コンポーネントのメモリのようなもの => ユーザー操作に併せて反応
+              - stateとpropsは連動して動く
+                - stateは親コンポーネントで情報を保存して子コンポーネントへpropsとしてデータを渡す
+        - ステップ4
+          - stateを保持するべき場所を特定する
+            - stateを保持するコンポーネントを指定する
+          - React => 単方向データーフロー
+            - 親から子へコンポーネントを下る形でデータが渡される
+          - フロー
+            - アプリケーション内の各 state について：
+              - そのstateに基づいて何かをレンダーするすべてのコンポーネントを特定する。
+              - 階層内でそれらすべての上に位置する、最も近い共通の親コンポーネントを見つける。
+                - state がどこにあるべきかを決定する：
+                  - 多くの場合、state をその共通の親に直接置くことができる。
+                    - state を、その共通の親のさらに上にあるコンポーネントに置くこともできる。
+                      - state を所有するのに適切なコンポーネントが見つからない場合
+                        - state を保持するためだけの新しいコンポーネントを作成し、共通の親コンポーネントの階層の上のどこかに追加する。
+          - 実際にフローをサンプルに当てはめて作成する
+            - FilterableProductTable => 共通の親 => stateをここで表示する
+                - SearchBar => stateを表示する必要がある
+                  - ProductTable => リストをフィルタリングする必要がある
+                    - ProductCategoryRow
+                    - ProductRow
+                - stateの値はFilterableProductTableで管理する事にする
+                  - stateの定義
+                    - const [filterText, setFilterText] = useState('');
+                    - const [inStockOnly, setInStockOnly] = useState(false);
+                      - 状態変数と管理する変数、初期値を定義する
+                        - 定義したstateをpropsとして子コンポーネントへ渡す
+        - ステップ5
+          - 逆方向のデータフローを追加する
+            - 単一方向のデータフローではユーザーからの処理を反映せる事ができていない
+              - つまり、逆方向のデータフローを追加する事が必要になる
+          - input要素にユーザー処理に応じたstateの更新が可能になるようにする
+            - FilterableProductTableがstateを保持している
+              - setFilterText
+              - setInStockOnly
+                - をSearchBar(子コンポーネント)が呼び出す事ができるようにする
+                  - set関数をonChange関数を使って発火できるようにする
+                    - onFilterTextChange
+                    - onInStockOnlyChange
+                      - SearchBar内部ではonChange関数に関数を紐づける
+    - フルスタックフレームワーク
+      - アプリケーションを本番環境においてデプロイするための機能
+        - 通常、サーバーが必要になるWebアプリケーションだが、フルスタックフレームワークにおいて必要ないことがある
+          - CSR => クライアントサイドレンダリング
+          - SPA => シングルページアプリケーション
+          - MPA => マルチページアプリケーション 
+          - SSG => 静的サイト生成
+            - これらは、CDNや静的ホスティングサービスにサーバー機能なしでデプロイすることができる
+              - ユースケースに応じてサーバーサイドレンダリングを追加することができる
+                - 最初はクライアントサイドにみに留めておき、その後要件に応じてサーバー機能を追加することができる
+        - Next.js (App Router) 
+          - App Router
+            - サーバーレスホスティング、独自のサーバーへのデプロイが可能、静的エクスポートもサポートしている
+              - Reactツリー内においてバンドル専用、インタラクティブ、サーバー専用
+                - 様々なコンポーネントを混在させることが可能になる
+        - React Router(v7)
+          - Viteと組み合わせてフルスタックReactフレームワークを作成する事ができる
+            - Web APIを重視していて様々なJSランライムやプラットフォーム向けのテンプレートを提供している
+        - Expo
+          - ネイティブアプリ用のReactフレームワーク
+        - フルスタック Reactフレームワーク
+          - TanStack Start (Beta)
+            - NitroやViteなどのビルドツールを使う
+              - フルドキュメントSSG（静的ページ）
+              - ストリーミング
+              - サーバー関数
+              - バンドル機能
+          - RedwoodJS
+            - プリインストールされたパッケージと設定を備えるフレームワーク
+              - 簡単にアプリケーションを構築する事が可能になる
 - Reactの仕様
     - JSX
         - React内でHTMLのようなマークアップをJavaScriptがかけるようになったJavaScrioptの拡張機能である
@@ -2982,7 +3106,14 @@
         - 過去に変更された配列全てのバージョンをhistoryという状態として定義して管理する
           - もう一度リフトアップする
             - 新しいトップレベルのコンポーネントを定義する
-              - 
+    - useStateを使わずにコンポーネントをレンダーする方法
+      - historyを使ってレンダーする
+        - [...history, nextSquares]の場合
+          - ...history => [[null,null,null], ["X",null,null]]
+          - nextSquares => ["X",null,"O"]
+            - であれば
+              - [[null,null,null], ["X",null,null], ["X",null,"O"]]
+                - に変わる
     - mosya演習(要件定義と処理)
         - JSXに変数を埋め込もう演習
             
@@ -3055,8 +3186,7 @@
             export const root = createRoot(document.getElementById("root"));
             root.render(<ProfileCard />);
             
-            ```
-            
+            ```           
         - スタイルを適用させてみよう
             
             ・要件
@@ -3109,8 +3239,7 @@
                 - handleClick関数を作成する
                 - ボタンにonClick={handleClick}として関数を紐づける
             
-            [回答できず答えみた](https://www.notion.so/192972e6c96080c0bd10fc16957fc0d7?pvs=21)
-            
+            [回答できず答えみた](https://www.notion.so/192972e6c96080c0bd10fc16957fc0d7?pvs=21)           
         - 条件に応じてクラス名を変更する
             - コンポーネント間はPropsを使って情報の受け渡しをしている
                 - HTMLのクラス名を要求に応じて
@@ -3195,8 +3324,7 @@
                     </div>
                   );
                 }
-                ```
-                
+                ```                
         - `BusinessCard`コンポーネントをカスタマイズしてみましょう！
             
             レッスンを進める際にかく事
@@ -3274,8 +3402,7 @@
                 </div>
               );
             }
-            ```
-            
+            ```            
         - Null 合体演算子
             
             プロフィールカードを完成させましょう！
@@ -3300,8 +3427,7 @@
                
               ↑
               {bio ?? "自己紹介はまだありません"}
-            ```
-            
+            ```           
         - オプショナルチェイニングの演習
             1. `image.size`が定義されていない場合は、`width`や`height`に`undefined`を設定してください。
                 - オプショナルチェイニングを使って配列名.プロパティ名?の形になるようにする
@@ -3333,8 +3459,7 @@
                 </div>
             ```
             
-            <img src={image.src} alt={image.alt} width={image.size?.width} height={image.size?.height} />
-            
+            <img src={image.src} alt={image.alt} width={image.size?.width} height={image.size?.height} />           
         - コンポーネントをimportしよう
             
             レッスンを進める際にかく事
@@ -3351,8 +3476,7 @@
             
             コンポーネントの表示方法
             
-            <コンポーネント名 />
-            
+            <コンポーネント名 />            
         - 簡単なクイズアプリを作る　詰まって考えたが難しかった回答を見た
             
             ・要件
@@ -3416,8 +3540,7 @@
             export const root = createRoot(document.getElementById("root"));
             root.render(<App />);
             
-            ```
-            
+            ```           
         - 画像を表示するAppコンポーネントを作ってみましょう！
             
             レッスンを進める際にかく事
@@ -3705,8 +3828,7 @@
             
             export const root = createRoot(document.getElementById("root"));
             root.render(<App />);
-            ```
-            
+            ```           
         - useEffectの演習（タイマーの作成）
             - 要件
                 - useEffectを使って画面表示から分:秒の形で表示されるタイマーを作成する
@@ -3749,8 +3871,7 @@
                 		  if (Ref.current === 10){
                 			  alert("クリックしすぎです！");
                 		  };}
-                ```
-                
+                ```               
         - useRefを使ってDOM操作を行いChartを使いグラフにして表示するー答えみたー
             - 要件
                 - useRefとChartというライブラリを使ってデータをグラフに描出する
@@ -3838,8 +3959,7 @@
                         </div>
                       );
                     
-                    ```
-                    
+                    ```                    
         - useEffectを使って値の変更に応じた処理を行う
             - 要件
                 - useEffectを使って動画の再生と停止を再生ボタンでコントロールできるようにする
@@ -3890,8 +4010,7 @@
                 
                   return [value, onChange];
                 }
-                ```
-                
+                ```                
         - useReducer
             - 要件
                 - Todoアプリの状態管理部分をuseReducerを使って実装する
@@ -3972,7 +4091,6 @@
               }
             };
             ```
-            
         - 配列messagesにメッセージを追加する
             - 要件
                 - 配列massagesにメッセージ（要素を追加する）
@@ -4026,8 +4144,7 @@
                             // 👇 ここに処理を追加してください
                             removeMessage(id);
                           };
-                        ```
-                        
+                        ```    
         - 配列の要素を更新する
             - 要件
                 - チャットアプリを作成する
@@ -4126,8 +4243,6 @@
                       );
                     
                     ```
-                    
-            
         - Suspence
             - 要件
                 - APIから情報を取得する。
@@ -4156,16 +4271,14 @@
                 data,
               };
             }
-            ```
-            
+            ```         
         - react-error-boundary
             - 要件
                 - /api/mock/musicの通信中にエラーが発生した場合に画面全体が影響を受けないようにする
             - ユーザー体験
                 - エラーが発生した場合でも対象のコンポーネントのみがエラー表示になるようになる
             - 処理
-                - ErrorBoundaryを使い、エラーが発生した場合に対象のコンポーネントのみがエラー表示されるようにする
-            
+                - ErrorBoundaryを使い、エラーが発生した場合に対象のコンポーネントのみがエラー表示されるようにする            
         - fetch関数を使ってサーバーへデータを送信する
             - 要件
                 - Todoリストを表示、追加できるアプリを作成する
@@ -4244,8 +4357,62 @@
                           return { todos, addTodo };
                         }
                         
-                        ```
-                        
+                        ```                       
+        - tabの切り替え   
+          ```jsx
+          import clsx from "clsx";
+          import React, { useState } from "react";
+          import { createRoot } from "react-dom/client";
+          
+          export default function App() {
+            const [tab, setTab] = useState(0);
+            const handleTabClick = (index) => () => {
+              setTab(index);
+            };
+            return (
+              <div className="tab" role="tab">
+                <div className="tab-list" role="tablist">
+                  <button
+                    className={clsx({ active: tab === 0 })}
+                    onClick={handleTabClick(0)}
+                  >
+                    タブ1
+                  </button>
+                  <button
+                    className={clsx({ active: tab === 1 })}
+                    onClick={handleTabClick(1)}
+                  >
+                    タブ2
+                  </button>
+                  <button
+                    className={clsx({ active: tab === 2 })}
+                    onClick={handleTabClick(2)}
+                  >
+                    タブ3
+                  </button>
+                </div>
+                {tab === 0 && (
+                  <div className="tab-panel" role="tabpanel">
+                    ここにタブ1のコンテンツが入ります。
+                  </div>
+                )}
+                {tab === 1 && (
+                  <div className="tab-panel" role="tabpanel">
+                    ここにタブ2のコンテンツが入ります。
+                  </div>
+                )}
+                {tab === 2 && (
+                  <div className="tab-panel" role="tabpanel">
+                    ここにタブ3のコンテンツが入ります。
+                  </div>
+                )}
+              </div>
+            );
+          }
+          
+          export const root = createRoot(document.getElementById("root"));
+          root.render(<App />);
+          ```    
 - 概念
     - イミュータブルなフレームワーク
         - Reacrではイミュータブルに変数を扱う
@@ -4812,61 +4979,103 @@
         - useSWR
             - 何でfetchではなくてuseSWRを使うのか？
                 - 何ができてできない
-- tabの切り替え   
-    ```jsx
-    import clsx from "clsx";
-    import React, { useState } from "react";
-    import { createRoot } from "react-dom/client";
-    
-    export default function App() {
-      const [tab, setTab] = useState(0);
-      const handleTabClick = (index) => () => {
-        setTab(index);
-      };
-      return (
-        <div className="tab" role="tab">
-          <div className="tab-list" role="tablist">
-            <button
-              className={clsx({ active: tab === 0 })}
-              onClick={handleTabClick(0)}
-            >
-              タブ1
-            </button>
-            <button
-              className={clsx({ active: tab === 1 })}
-              onClick={handleTabClick(1)}
-            >
-              タブ2
-            </button>
-            <button
-              className={clsx({ active: tab === 2 })}
-              onClick={handleTabClick(2)}
-            >
-              タブ3
-            </button>
-          </div>
-          {tab === 0 && (
-            <div className="tab-panel" role="tabpanel">
-              ここにタブ1のコンテンツが入ります。
-            </div>
-          )}
-          {tab === 1 && (
-            <div className="tab-panel" role="tabpanel">
-              ここにタブ2のコンテンツが入ります。
-            </div>
-          )}
-          {tab === 2 && (
-            <div className="tab-panel" role="tabpanel">
-              ここにタブ3のコンテンツが入ります。
-            </div>
-          )}
-        </div>
-      );
-    }
-    
-    export const root = createRoot(document.getElementById("root"));
-    root.render(<App />);
-    ```    
+- アプリケーションを作成する
+  - 前述した様々なフレームワークを活用してアプリケーションを作成する方法
+  - フレームワークを活用せずにアプリケーションを作成する方法
+    - 例：
+      - 制約がある場合
+        - 既存のフレームワークでは対応する事が難しい場合
+        - 自分自身でフレームワークを作成したい場合
+        - Reactアプリケーションにおける基本を学習したい場合
+          - ゼロからアプリケーションを作成するという事は自分自身でフレームワークを作成するようなものと理解すると良い
+            - ルーティング
+            - データフェッチ
+            - ツールの選定
+    - フレームワークを使わずにアプリケーションを作成する方法:実際
+      - ビルドツールの選定
+        - Vite
+        - parcel
+        - rsbuild
+          - ソースコードのパッケージ化
+          - ローカルの開発サーバー
+          - デプロイするためのビルドコマンドが提供さえる
+        - Vite
+          - 使い方に規約がある (opinionated) ツール
+            - 豊富なプラグインエコシステムがある
+              - React Routerでビルドツールとして利用されている
+        - parcel
+          - 初期体験
+          - スケーラブル => スケールする事が可能
+        - rsbuild
+          - Rspackを基にしたビルドツール
+            - パフォーマンスの最適化が使える
+      - パターンの構築
+        - 最初にビルドツールを使って作成できるアプリはSPAのアプリケーションがあげられる
+          - 一般的な機能には対応していない状態になっている
+        - ルーティング
+          - 特定のURLにアクセスした時にどのコンテンツやページを表示するか決定する
+            - URLをマッピングする必要がある
+              - コード内で設定する
+              - コンポーネントのフォルダ、ファイルに基づいて定義する事もあり
+                - データフェッチ
+                - コード分割
+                - ページのレンダーと統合されている
+                  - 推奨ライブラリ
+                    - React Router
+                    - Tanstack Router
+        - データフェッチ
+          - サーバーを含めたデータの取得はアプリケーションにおいて重要な作業
+            - ローディング状態の管理
+            - エラー状態の管理
+            - 取得したデータのキャッシュ管理
+          - 基本的にはコンポーネント内で使用されるもの
+            - サーバーレンダーにも利用可能になっている
+          - 推奨ライブラリ例
+            - バックエンド、RESTスタイルのAPIから取得する場合
+              - React Query
+              - AWR
+              - RTK Query
+            - GraphQL APIから取得する場合
+              - Apollo
+              - Relay
+        - コード分割
+          - アプリケーションにおけるコードの量は機能やライブラリに応じて増加していく
+            - オンデマンドで読み込む事ができる複数の小さなバンドルへ分割する作業
+              - また、チャートなどに遅延読み込みを使うと必要な分だけのレンダーを行う事ができるが、初回レンダー後に再度、読み込みを行う必要がある
+                - 複数回の待機が存在する事になってしまう=>ウォーターフォール
+          - コード分割においては、バンドルやデータフェッチと統合してレンダー時間を短縮する
+        - アプリパフォーマンスの向上
+          - ビルドツールにおいてはデフォルトでSPAをサポートしているものがある
+            - そのような場合に他のレンダーパターンは自分で実装する必要がある
+              - SPA
+                - 単一のHTMLページを読み込む
+                  - 初期読み込み(初回レンダー)においては時間がかかるユーザーの操作に応じて動的にページが切り変わる
+              - SSR
+                - サーバーでページをレンダーしてレンダーされたページをクライアントに返す
+                  - パフォーマンス向上が見込めるが、設定、メンテナンスが複雑になる
+                    - ストリーミングを追加すると構築、メンテナンスが複雑になる
+              - SSG
+                - ビルド時に静的HTMLファイルを生成する
+                  - パフォーマンス向上が見込める
+                    - 設定、メンテナンスがサーバーサイドレンダリングよりも複雑になる
+              - RSC
+                - 単一のReactツリー内で
+                  - ビルド専用コンポーネント
+                  - サーバー専用コンポーネント
+                  - インタラクティブなコンポーネント
+                    - これらを混在させる事ができる
+          - これらのレンダー戦略を適切に選択する事で
+            - コンテンツの最初のバイトが読み込まれるまでの時間=>(Time to First Byte)
+            - 最初のコンテンツが表示されるまでの時間=>(First Contentful Paint)
+            - アプリの最大の可視コンテンツが表示されるまでの時間=>(Largest Contentful Paint)
+              - これらを短縮する事ができる可能性がある
+                - ここまでの様々な課題において、これでも考える必要があるほんの1部の機能
+                  - 自力で解決する事が難しい場合にはフレームワークを使う事も可能である
+- 既存プロジェクトにReactを追加する
+  - 既存んプロジェクトにインタラクティブな要素を加えたい場合
+    - Reactで最初から記載する必要はない
+      - Reactを既存のスタックに追加する事でインタラクティブなReactコンポーネントをレンダーする事が出来るようになる=>ローカル環境においてはNode.jsが必要になる
+  - 
 - **React JavaScript TypeScriptの関係性（AIまとめ）**    
     React、JavaScript、TypeScriptは、それぞれ異なる役割を持ちながらも密接に関係している。
     
