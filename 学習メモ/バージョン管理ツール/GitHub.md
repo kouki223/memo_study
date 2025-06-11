@@ -24,7 +24,7 @@
                     - Branch
                         - main
                         - feacher
-                
+
                  ↓
                 - コミット3（main）
                 - コミット3｀(feacher)
@@ -367,3 +367,9 @@
         - https://git-scm.com/book/ja/v2
     - 実際にGitを使ってみる続き
         - https://note.com/nahito/n/nded6e4dd7382
+
+- GitとGithubに関して復習する
+    - Git
+        - バージョン管理のためのCLI
+    - Github
+        - Gitで管理しているソースコードをわかりやすくオンラインで共有する事ができるプラットフォーム
