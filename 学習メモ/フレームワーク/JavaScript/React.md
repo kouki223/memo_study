@@ -812,14 +812,14 @@
         - Square コンポーネントが呼び出す関数から始める
           - その関数を onSquareClick関数と定義する
             - クリックに応じて関数が発火するようにする事ができる
-        - ハンドル関数とオン関数で紐づける
-          - ハンドル関数ないでは配列に対してインデックス番号を使ってさらにsliceメソッドなどを活用して新しい配列のコピーを作成して書き換える
-            - ミューテーと
+        - hundle関数とonchange関数で紐づける
+          - hundle関数内では配列に対してインデックス番号を使ってさらにsliceメソッドなどを活用して新しい配列のコピーを作成して書き換える
+            - ミューテート
             - イミュータブル
         - 状態が変更されると再レンダーが起こる
           - しかし、差異がないコンポーネントに関してはレンダーをスキップしたい場面がある
             - その場合にはレンダリングをスキップする事ができる
-              - イミュータブルの利点がある部分
+              - イミュータブルの利点がある部分2
     - Hooks
         [Hooksの内部プログラム](https://www.notion.so/Hooks-1a6972e6c96080bcb853f118d8dfadc6?pvs=21)
         - Hooksとは？
@@ -3106,6 +3106,67 @@
         - 過去に変更された配列全てのバージョンをhistoryという状態として定義して管理する
           - もう一度リフトアップする
             - 新しいトップレベルのコンポーネントを定義する
+    - React refとダイアログの関係性
+      - https://www.miracleave.co.jp/contents/2095/post-2095/
+        - ダイアログを使う事に加えてダイアログを開いた時に自動スクロールを実装する際に気を付ける事
+          - スクロール処理
+            - スクロール処理はElement.ScrollTo()を使う事で処理を行う事ができる
+              - Elementの参照方法が課題
+                - useRefを使う方法
+                   ```JavaScript
+                  //ダイアログのrefオブジェクト
+                    const dialogRef = useRef(null)
+
+                    // ダイアログを開けたら、スクロールするuseEffect
+                    React.useEffect(() => {
+                      if (open) {
+                        if (dialogRef.current !== null) {
+                          dialogRef.current.scrollTo(0, 2000);　// スクロール処理
+                        }
+                      }
+                    }, [open]);　// 依存配列にはダイアログの開閉state
+
+                    ~~~~~~~~~~~~~~省略~~~~~~~~~~~~~~~~
+                          <Dialog
+                            open={open}　　　//  ダイアログの開閉state
+                            onClose={handleClose}
+                            scroll="paper"
+                            aria-labelledby="scroll-dialog-title"
+                            aria-describedby="scroll-dialog-description"
+                          >
+                            <DialogTitle id="scroll-dialog-title">Subscribe</DialogTitle>
+                            <DialogContent
+                              dividers
+                    　　　　　　    ref={dialogRef}    //  ref属性にrefオブジェクトをセット
+                            >
+                    ```
+                    - しかし、上記のプログラムだとdialogRef.currentがnullとなっており参照する事ができない
+                      - Dialogはopenの状態ではまだDOMツリーに反映されておらずにDialogを開いた時にマウントされるという特徴がある
+                - ref属性に対してコールバック関数を渡す方法
+                  - ref属性にコールバック関数を渡してコールバック関数内でスクロール処理を実行する
+                    - コールバック関数には、nodeを渡す事ができる(自分自身のnodeを引数として受けとってその値に合わせて処理を行う)
+                    ```JavaScript
+                    cost scrollDialog = useCallback((node) =>　{　// 引数にnodeを受け取る
+                        if (!node) return;  // nodeがnullの場合はリターンして処理終了
+                        if (node.scrollTop !== 2000) {
+                            node.scrollTo(0, 2000); // スクロール処理
+                        }
+                    },[]);
+
+                    ~~~~~~~~~~~~~~省略~~~~~~~~~~~~~~~~
+                          <Dialog
+                            open={open}　　　//  ダイアログの開閉state
+                            onClose={handleClose}
+                            scroll="paper"
+                            aria-labelledby="scroll-dialog-title"
+                            aria-describedby="scroll-dialog-description"
+                          >
+                            <DialogTitle id="scroll-dialog-title">Subscribe</DialogTitle>
+                            <DialogContent
+                              dividers
+                    　　　　　　    ref={scrollDialog}    //  ref属性にコールバック関数をセット
+                            >
+                    ```
     - useStateを使わずにコンポーネントをレンダーする方法
       - historyを使ってレンダーする
         - [...history, nextSquares]の場合
