@@ -1775,7 +1775,6 @@
                                 container.scrollLeft -= scrollAmount;
                               }
                     ```
-                    
         - useReducer
             - 要件
                 - クイズアプリの状態管理部分を作成する

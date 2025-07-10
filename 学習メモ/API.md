@@ -48,7 +48,6 @@
             - RESTに沿ったAPI
                 - RESTとは？(Representational State Transfer)
                     - 状態をリクエスト間で保持しない
-                    - 
     1. APIドキュメンテーションの確認
         - API仕様書
             - APIの使用方法、機能に関する情報を提供する文書
