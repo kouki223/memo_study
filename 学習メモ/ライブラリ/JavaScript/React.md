@@ -26,6 +26,7 @@
 - 学習ソース
     https://mosya.dev/react/dashboard
     https://ja.react.dev/learn
+    https://qiita.com/hinako_n/items/0f1e9e9b56a888d86641
 - Reactの概要
     - Reactとは？
         - JavaScriptのフレームワーク
@@ -907,7 +908,110 @@
                         - const inputElement = useRef(null)
                         ref={inputElement}
             - useContext
-                - データをグローバルとみなす
+                - データをグローバルとみなす事が可能になるHooks
+                  - React context APIという概念
+                    - Contextオブジェクト
+                      - 直接的な親子関係にないコンポーネント同士で同じ値を共有する方法
+                    - Context Provider
+                      - Contextオブジェクトを扱う範囲を決定するプロバイダー
+                    - Context Consumer
+                      - プロバイダーで決定された範囲ないでContextオブジェクトにアクセスする方法
+                - useContextはContextを簡単に使うためのHookである
+                  ```JavaScript
+                    const { Contextから受け取る値や関数 } = useContext(Contextオブジェクト名);
+                  ```
+                  - valueに値を渡したり、必要な値を使う事が可能になる
+              - Contextを使う手順
+                1. 　createContext()を使ってContextオブジェクトを生成する。
+                  - 子コンポーネント内で使う変数や関数を使うためのContextオブジェクトを作成する
+                    - createContext()を使う事でどこでもオブジェクトを生成する事が可能
+                      - 通常、contextディレクトリを作成してContext.tsxのように管理する事が多い
+                        ```JavaScript
+                        // src/contexts/CountContexts.jsx
+
+                        import { useState, createContext } from "react";
+
+                        // Contextオブジェクトを生成する
+                        export const CountContext = createContext();
+
+                        // 生成したContextオブジェクトのProviderを定義する
+                        export const CountProvider = ({children}) => {
+                          const [count, setCount] = useState(0)
+
+                          return (
+                            <CountContext.Provider value={{
+                              count,
+                              setCount
+                            }}>
+                              {children}
+                            </CountContext.Provider>
+                          );
+                        }
+                        ```
+                        - Contextオブジェクトの作成
+                          - CountContext
+                        - 子孫コンポーネントをプロバイダーで囲む事でvalueに設定している値や変数を渡す事が可能になる
+                          - <Contextオブジェクト名.Provider value={ 子孫コンポーネントに渡す変数・関数 }>
+                2. 　Providerコンポーネントをコンポーネントツリー上に設置する。
+                  - Contextオブジェクトの作成時にExportしているためコンポーネントツリー上に設置し、下位のコンポーネントでも使う事が可能にする
+                    ```JavaScript
+                    // src/App.js
+
+                  import { ComponentA } from "./components/ComponentA";
+                  import { CountProvider } from "./contexts/CountContexts";
+
+                  export default function App() {
+                    return (
+                      <div>
+                        <CountProvider>
+                          <ComponentA />    // ComponentAの配下にあるコンポーネントでContextを利用可能
+                        </CountProvider>
+                      </div>
+                    );
+                  }
+                  ```
+                  - CountProviderで指定した範囲の子要素においてContextオブジェクトを使う事が可能になる
+                3. 　子孫コンポーネントでContextオブジェクトを使う。
+                  - 親コンポーネントにおいてContext Providerを設置しているため子コンポーネントとその子コンポーネントにおいてもContextオブジェクトを使用する事が可能になる
+                    - 子コンポーネント内における使用方法
+                      ```JavaScript
+                      // src/components/ComponentA.jsx
+                      import { useContext } from 'react'
+                      import { ComponentB } from './ComponentB'
+                      import { CountContext } from "../contexts/CountContexts";
+
+                      export const ComponentA = () => {
+                        // const { Contextから受け取る値や関数 } = useContext(Contextオブジェクト名);
+                        const { count, setCount } = useContext(CountContext);
+
+                        return (
+                          <div>
+                            <p>
+                              ComponentA：{count}
+                              <button onClick={() => setCount(count + 1)}> + </button>
+                            </p>
+                            <ComponentB />
+                          </div>
+                        );
+                      }
+                      ```
+                      - Hooks(useContext)をimportする
+                        - import { useContext } from 'react'
+                      - useContextの引数にimportしたCountContextを渡す
+                        - const { count, setCount } = >useContext(CountContext);<
+                      - 使いたいオブジェクトをコンポーネント内で取り出す
+                        - >const { count, setCount }< = useContext(CountContext);
+              - Contextを使う事で各子コンポーネント内において同じ状態を管理する事ができる
+                - お互いのコンポーネントがお互いのコンポーネント内における状態を知る事ができる
+              - 実用例：
+                - テーマ毎に分割したコンテキスト
+                - 認証情報の共有
+                  - 認証情報をコンテキストに任せる事でUIにおいては認証情報を気にする必要がなくなる
+                - パフォーマンスの最適化
+              - 注意点：
+                - 頻繁に値が変化するものには使うのを極力さける
+                  - 頻繁に値が変化するものに関しては他のReactが提供するState機能を使う事が推奨される
+                    - 例：Reduxなど
             - useReducer
                 - 状態を管理するHook
                     - useStateが内部実装されている
