@@ -1,5 +1,3 @@
-- 学習ソース
-    - https://qiita.com/nnahito/items/565f8755e70c51532459
 - ***GitHubでできる事***
     - コードの共有
         - Gitで管理しているソースコードをわかりやすく共有できるもの
@@ -362,6 +360,7 @@
         - ブランチのマージ
             - 結合したいbranchにcheckoutで移動してから
             - git merge 取り込むブランチ名
+            
 - gitの学習
     - 公式のドキュメント
         - https://git-scm.com/book/ja/v2
@@ -373,3 +372,7 @@
         - バージョン管理のためのCLI
     - Github
         - Gitで管理しているソースコードをわかりやすくオンラインで共有する事ができるプラットフォーム
+
+
+- 学習ソース
+    - https://qiita.com/nnahito/items/565f8755e70c51532459
