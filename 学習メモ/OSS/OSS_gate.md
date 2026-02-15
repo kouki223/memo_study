@@ -1,4 +1,5 @@
 (OSS Gate)[https://www.youtube.com/watch?v=pWxC9KdxdrQ]
+(OSS Gate テキストver)[https://slide.rabbit-shocker.org/authors/oss-gate/workshop-tutorial-online/]
 
 # OSSとは
 
@@ -7,6 +8,8 @@
         - ライセンスを確認できる
             - BSDライセンス
             - BSD LIKE ライセンス => OSSとは呼ぶことが出来ない
+
+## OSSへフィードバックを行う
 
 - フィードバック
     - upstreamに報告すること
