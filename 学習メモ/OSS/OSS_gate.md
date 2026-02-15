@@ -1,5 +1,6 @@
-(OSS Gate)[https://www.youtube.com/watch?v=pWxC9KdxdrQ]
-(OSS Gate テキストver)[https://slide.rabbit-shocker.org/authors/oss-gate/workshop-tutorial-online/]
+- 参考リンク
+    - [OSS Gate](https://www.youtube.com/watch?v=pWxC9KdxdrQ)
+    - [OSS Gate テキストver](https://slide.rabbit-shocker.org/authors/oss-gate/workshop-tutorial-online/)
 
 # OSSとは
 
