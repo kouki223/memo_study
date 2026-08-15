@@ -153,3 +153,16 @@ CMD ["node", "server.js"]
 コンテナビルド => docker run -p 3000:3000 next-rest-api-sample
 
 Nexxt.js で REST APIが実装出来るという事
+
+# Server Actions
+APIルート（Route Handlers）を作成せずに、サーバー側の処理を直接呼び出せる仕組み
+- 使い分け
+
+fetchを使ったREST APIは型の管理やエンドポイントの実装が必要。
+Server ActionsはJSの関数のように呼び出せ、主にデータ更新に特化している。
+
+- 裏側の仕組み
+
+ビルド時にユニークなアクションIDが割り振られる。
+クライアント実行時には <input type="hidden"> などで自動生成され、Next-Actionヘッダーを付与したPOSTリクエストが自動で送信される。
+
