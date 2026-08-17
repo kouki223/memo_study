@@ -1,10 +1,10 @@
 - 学習ソース
-    https://mosya.dev/react/dashboard
-    https://recursionist.io/learn/languages/typescript/function/callback
-    - サバイバルTypeScript
-        - 実務において最低限使う内容のみをまとめたドキュメント
-            - TypeScriptを網羅的にまとめたドキュメントとは違う
-                - 実務においてこれだけ知っていれば死なない（サバイバル）ようにするドキュメント
+  [https://mosya.dev/react/dashboard](https://mosya.dev/react/dashboard)
+  [https://recursionist.io/learn/languages/typescript/function/callback](https://recursionist.io/learn/languages/typescript/function/callback)
+  - サバイバルTypeScript
+    - 実務において最低限使う内容のみをまとめたドキュメント
+      - TypeScriptを網羅的にまとめたドキュメントとは違う
+        - 実務においてこれだけ知っていれば死なない（サバイバル）ようにするドキュメント
 - Type Scriptの概要
     - TypeScriptとは？
         - プログラミング言語
@@ -829,6 +829,26 @@
               - 型も定義される
                 - リバースマッピングが完成する
         - interface
+			- 概念
+				- TypeScriptにおいて、構造的部分型を実現する機能
+					- 型という概念において、それぞれの型における具体と抽象の関係性を実現する機能
+				-  部分型という概念
+					- 型という概念にも具体と抽象が存在する
+						- 表現方法として、Javaなどで採用されている名前的部分型と構造的部分型がある
+							- TypeScriptは
+        	- 具体的な機能として、大きく分けて2つの役割を持つ
+            	- 1. クラスにおける約束事を決める機能
+            	- 2. オブジェクト型で型定義を行う事が出来る型エイリアスとしての機能
+			- Javaなどにはinterfaceという機能がすでに存在していたが、動的型付け言語であるJavaScriptには機能として存在していなかった
+				- TyepScriptによって実現した
+					- JavaScriptのスーパーセットであるTypeScriptはダックタイピングの概念を継承した構造的部分型を採用しているという事になる
+			- 状況に応じて名前的部分型を実現したい場合
+				- 構造的部分型のみでは意図しない形になっていまう場合が存在する
+					- 多くのデータが保持しているIDのようなプロパティが同じIDを保有する異なったデータの型にの部分型として判別されてしまう
+						- 公称型クラスという概念が存在するため、名前的部分型を実現する事は可能
+							- クラスの内部にprivateが存在する
+							- _brandを使う
+								- 上記の場合に、公称型クラスとして判別され、ラベリングされた名前との整合性が取れるデータのみに指定する事が出来るデータ型として判定される
             - どのプロパティがどのようなデータの型を持つのか定義する事が出来る
                 - プログラム内でプロパティを追加して記載する事ができる
                 
