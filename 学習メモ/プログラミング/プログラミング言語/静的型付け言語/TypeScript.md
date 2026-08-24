@@ -436,7 +436,15 @@
                     message = true;
                     
                     ```
-                    
+            - **Partial<T>**
+              - 全てのプロパティをオプショナルプロパティにする事が出来る
+                - 本来であれば、全てのプロパティを明示する必要がある所を引数がない場合には存在しないものとして判別してくれる
+                  ```TypeScript
+                  type Partial<T> = {
+                    [P in keyof T]?: T[P];
+                  };
+                  ```
+                  - 内部では、全てのプロパティに?をつけた型を再生成してくれている
             - **戻り値の存在しない関数などの型注釈**
                 - 関数の処理が完了する場合
                   - void型
@@ -502,6 +510,10 @@
                     }
                     //このinputにtrueなどを引数に渡すとエラーになってしまう
                     ```
+
+                - 書き方
+                  - | で繋げて2つ以上の型を記述する。
+                    - 型リスト冒頭に置く事も出来る
                     
                 - ユニオン型が必要になる場面
                     - 取得するデータが複数の型を持ちうる時
@@ -562,7 +574,25 @@
                     
                     type UserWithAdditionalField = User & AdditionalField;
                     ```
-                    
+            - リテラル型
+              - プリミティブ型の特定の値だけを代入可能にする型
+                - 1だけを代入可能な状態にする処理
+                  ```TypeScript
+                    let x: 1;
+                    x = 1;
+                    x = 100;
+                  ```
+                  - boolean型のtrueとfalse
+                  - number型の値
+                  - string型の文字列
+                    - 上記の3つがリテラル型として表現する事が出来る
+                - ユースケース
+                  - マジックナンバーやステートの表現などに使う
+                    - 特定のnumber
+                    - スタータス管理文字列など
+            -  null型
+            - undefined型
+            	- undefinedとnullの違い        
             - unknown型
                 - anyと同様にどのような型でも許容される型
                     - 型チェックを行わないと演算やメソッドを活用する事ができない
@@ -591,58 +621,7 @@
                         }
                         ```
                         
-        - タイプガード
-            - ある変数の型が決まりきらない場合にとりあえず型をunknownに指定する
-                - 指定したunknownの型を条件分岐に応じて決定する方法
-                    - typeof 演算子
-                        - if文と組み合わせて使う
-                            - if文の条件式としてtypeof valueとする
-                        - プログラムの実行時に値に応じて型が決まり処理が実行される
-                        
-                        ```tsx
-                        let value: unknown = "こんにちは";
-                        
-                        if (typeof value === "string") {
-                          console.log(value.length); // String型のプロパティにアクセスできる
-                        } else if (typeof value === "number") {
-                          console.log(value.toFixed(2)); // Number型のメソッドにアクセスできる
-                        } else {
-                          console.log("文字列でも数値でもありません");
-                        }
-                        ```
-                        
-                    - instanceof 演算子
-                        - 特定のオブジェクトがクラスのインスタンスであるか判断する演算子
-                    - カスタム型ガード関数
-                        - typeof演算子を使って渡された引数に応じた処理を行う
-                            - typescriptにおいてはisも使う
-                                - isは関数がtrueを返す場合にはisで指定された型であるという事
-                            
-                            ```tsx
-                            //isString関数は引数としてvalueを受け取る
-                            //引数の型はunknownであり、isString関数がtrueの場合には
-                            //valueの型はstringである事を示す
-                            function isString(value: unknown): value is string {
-                            	//typeof演算子でunknownの型をstringに指定する
-                              return typeof value === "string";
-                            }
-                            
-                            function isNumber(value: unknown): value is number {
-                              return typeof value === "number";
-                            }
-                            
-                            function printValue(value: unknown) {
-                              if (isString(value)) {
-                                console.log(`文字列: ${value}`); // value は string 型として扱われる
-                              } else if (isNumber(value)) {
-                                console.log(`数値: ${value}`); // value は number 型として扱われる
-                              } else {
-                                console.log("文字列でも数値でもない");
-                              }
-                            }
-                            
-                            ```
-                            
+                    
         - 配列型
             - あらかじめ複数の値を持つことができる型
                 - 要素に指定された型の後ろに[]とする事で配列の型を指定できる
@@ -1201,6 +1180,88 @@
         - イベントループ
         - 非同期処理
           - これらでタスク処理をコントロールする
+    - 制御フロー分析と型ガード
+      - 型が曖昧な状態はTypeScriptにおいて許可されない => コンパイラーが理解できない
+        - ユニオン型を使う事で起きうる型が曖昧に表現される状態
+          - ユニオン型を扱う事で複数の型を扱える反面、複数の型の可能性が存在する
+            - その場合、特定の型で実行可能な処理が特定の型では実行不可である事が起きうる
+              - 上記のような場合に曖昧さを排除する制御フローが必要になる
+      - 制御フロー分析
+        -  TypeScriptでは、型をinstanceofで生成した後に型とデータの状態をifやforを使って処理が実行されるタイミングで持ちうる型を分析する => objectなのか？Nullなのか？確認する
+          - 型ガード
+            - if文や変数を使って判別する事も可能
+          - ディスクリミネータ(discriminator)という概念
+            - ユニオン型として、ディスクリミネータ(discriminator)を持つ場合には、自由なプロパティを持つ事が出来る
+              - 絞り込んだ結果などをコンパイラーが理解する事が出来る
+    - 判別可能なユニオン型
+      - 特定の値のみしか代入できない性質を持っているユニオン型という性質を使って型を判別する仕組みが構築する事が出来る
+        - ユニオン型を使って型をコンパイラーが判別可能な状態にする
+          - 人間的には型の絞り込みを出来ていると判断しているが、システムは他の可能性も存在すると判別している
+            - そのため、discriminatedを使ってユニオン型の型を適応させる事でコンパイラーが判別可能な状態へする事が出来る
+              - ユニオン型は、柔軟に型の値を決定する事が出来る型のため柔軟に作り込む事が出来る
+                - 各プロパティ(しるし)を判別するための方法としてディスクリミネータ(discriminator)を使う
+                  - ディスクリミネータ(discriminator)さえあればどのようなプロパティを持っていたとしても問題ない
+    - タイプガード
+      - ある変数の型が決まりきらない場合にとりあえず型をunknownに指定する
+          - 指定したunknownの型を条件分岐に応じて決定する方法
+              - typeof 演算子
+                  - if文と組み合わせて使う
+                      - if文の条件式としてtypeof valueとする
+                  - プログラムの実行時に値に応じて型が決まり処理が実行される
+                  
+                  ```tsx
+                  let value: unknown = "こんにちは";
+                  
+                  if (typeof value === "string") {
+                    console.log(value.length); // String型のプロパティにアクセスできる
+                  } else if (typeof value === "number") {
+                    console.log(value.toFixed(2)); // Number型のメソッドにアクセスできる
+                  } else {
+                    console.log("文字列でも数値でもありません");
+                  }
+                  ```
+                  
+              - instanceof 演算子
+                  - 特定のオブジェクトがクラスのインスタンスであるか判断する演算子
+              - カスタム型ガード関数
+                  - typeof演算子を使って渡された引数に応じた処理を行う
+                      - typescriptにおいてはisも使う
+                          - isは関数がtrueを返す場合にはisで指定された型であるという事
+                      
+                      ```tsx
+                      //isString関数は引数としてvalueを受け取る
+                      //引数の型はunknownであり、isString関数がtrueの場合には
+                      //valueの型はstringである事を示す
+                      function isString(value: unknown): value is string {
+                        //typeof演算子でunknownの型をstringに指定する
+                        return typeof value === "string";
+                      }
+                      
+                      function isNumber(value: unknown): value is number {
+                        return typeof value === "number";
+                      }
+                      
+                      function printValue(value: unknown) {
+                        if (isString(value)) {
+                          console.log(`文字列: ${value}`); // value は string 型として扱われる
+                        } else if (isNumber(value)) {
+                          console.log(`数値: ${value}`); // value は number 型として扱われる
+                        } else {
+                          console.log("文字列でも数値でもない");
+                        }
+                      }
+                      
+                      ```
+    - typeof演算子
+      - JavaScriptの機能
+        - 値の型を調べる事が出来る
+          - ifやswitchを使って判別する事が可能
+      - 気をつけるべき点
+        - nullの扱い
+          - nullはobjectとして判別されてしまう
+        - 配列の扱い
+          - 配列も、objectとして認識される
+            - objectとして認識される事ではなく、isArrayを使って判別する
     - 演習
         - 引数に型を指定する
             - 要件
@@ -1927,18 +1988,9 @@
   varはもう使わない
   変数宣言の型推論
   型推論と動的型付けの違い
-  プリミティブ型
-  boolean型
-  number型
-  string型
-  null型
-  undefined型
-  undefinedとnullの違い
-  symbol型
   bigint型
   型強制
   ボックス化
-  リテラル型
   any型
   オブジェクト
   構造的型付け
@@ -1946,14 +1998,12 @@
   タプル
   列挙型
   ユニオン型
-  判別可能なユニオン型
   インターセクション型
   型エイリアス
   型アサーション「as」
   constアサーション「as const」
   satisfies演算子 「satisfies operator」
   明確な割り当てアサーション
-  typeof演算子
   等価であるということ
   truthyな値、falsyな値
   型のメンタルモデル
@@ -2007,7 +2057,6 @@
     Date
     RegExp
     Error
-  - 🚧モジュール
   - import、export、require
   - シングルプロセス・シングルスレッドとコールバック
   - 型の再利用
@@ -2185,6 +2234,3 @@
 - TypeScript Playgroundの使い方
   - ブラウザでTSの実行環境が用意されている
     - TSをインストールせずにブラウザで使用が可能になる
-- 🚧TypeScript超入門 〜10分でわかるTypeScriptの概要〜
-  - 今後、開設予定
-            
